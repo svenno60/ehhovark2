@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ehhovark Generaator</title>
+</head>
+<body>
+    <h1>Ehhovark Generaator</h1>
+    <form id="inputForm">
+        <label for="sugu">Sugu (m/n):</label>
+        <input type="text" id="sugu" name="sugu" required><br><br>
+        <label for="userInput">Sisesta tekst:</label><br>
+        <textarea id="userInput" name="userInput" rows="10" cols="50" required></textarea><br><br>
+        <label for="debug">Debug mode:</label>
+        <input type="checkbox" id="debug" name="debug">
+        <select id="debugLevel">
+            <option value="info">Info</option>
+            <option value="warn">Warning</option>
+            <option value="error">Error</option>
+        </select>
+        <button type="button" onclick="clearDebug()">Clear Debug</button><br><br>
+        <button type="submit">Genereeri raport</button>
+    </form>
+    <div id="debugOutput" style="display:none; background: #f5f5f5; padding: 10px; border: 1px solid #ddd; margin: 10px 0;">
+        <h2>Debug Output</h2>
+        <pre id="debugLog" style="white-space: pre-wrap; font-family: monospace;"></pre>
+    </div>
+    <h2>Generated Report</h2>
+    <pre id="report"></pre>
+
+    <script>
+        function clearDebug() {
+            document.getElementById('debugLog').textContent = '';
+            console.clear();
+        }
+
+        function debugLog(msg, data, level = 'info') {
+            if (!document.getElementById('debug').checked) return;
+            if (document.getElementById('debugLevel').value === 'error' && level !== 'error') return;
+            if (document.getElementById('debugLevel').value === 'warn' && level === 'info') return;
+            
+            const debugDiv = document.getElementById('debugOutput');
+            const debugLog = document.getElementById('debugLog');
+            debugDiv.style.display = 'block';
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const logColor = level === 'error' ? 'red' : level === 'warn' ? 'orange' : 'blue';
+            const logMsg = `[${timestamp}] ${level.toUpperCase()}: ${msg}\n${data ? JSON.stringify(data, null, 2) + '\n' : ''}`;
+            
+            debugLog.innerHTML += `<span style="color: ${logColor}">${logMsg}</span>`;
+            
+            // Console output with grouping
+            console.group(`${level.toUpperCase()}: ${msg}`);
+            if (data) console.log(data);
+            console.groupEnd();
+        }
+
+        document.getElementById('inputForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            try {
+                const sugu = document.getElementById('sugu').value.toLowerCase();
+                const userInput = document.getElementById('userInput').value;
+                debugLog('Input received:', { sugu, userInput });
+                
+                const report = generateReport(sugu, userInput);
+                document.getElementById('report').textContent = report;
+                debugLog('Report generated successfully');
+            } catch (error) {
+                console.error('Error:', error);
+                debugLog('Error generating report:', error, 'error');
+                document.getElementById('report').textContent = 'Error: ' + error.message;
+            }
+        });
+
+        function generateReport(sugu, userInput) {
+            debugLog('Starting report generation');
+            const a = userInput.split(/\s+/);
+            debugLog('Input split into array:', a);
+
+            // Wrap value parsing in try-catch
+            function safeParseFloat(arr, index, label) {
+                try {
+                    if (!arr[index]) {
+                        debugLog(`Warning: ${label} - Missing value at index ${index}`, null, 'warn');
+                        return 0;
+                    }
+                    const value = parseFloat(arr[index]);
+                    if (isNaN(value)) {
+                        debugLog(`Warning: ${label} - Invalid number: ${arr[index]}`, null, 'warn');
+                        return 0;
+                    }
+                    debugLog(`${label} parsed:`, value);
+                    return value;
+                } catch (e) {
+                    debugLog(`Error parsing ${label}:`, e, 'error');
+                    return 0;
+                }
+            }
+
+            let rvbase = 0, rvbasex = "PUUDU";
+            if (a.includes("RVDd:")) {
+                rvbase = safeParseFloat(a, a.indexOf("RVDd:") + 1, "RVDd");
+                rvbasex = rvbase < 4.15 ? "normaalse suurusega" : "dilateerunud";
+            }
+
+            let seinapaksusx = "PUUDU";
+            if (a.includes("IVSd:") && a.includes("LVPWd:")) {
+                const ivs = safeParseFloat(a, a.indexOf("IVSd:") + 1, "IVSd");
+                const pwt = safeParseFloat(a, a.indexOf("LVPWd:") + 1, "LVPWd");
+                const seinapaksus = Math.max(ivs, pwt);
+                const limits = sugu === "m" ? [1.1, 1.35, 1.61] : [1, 1.25, 1.51];
+                seinapaksusx = seinapaksus < limits[0] ? "normaalse paksusega" :
+                               seinapaksus < limits[1] ? "kergelt hüpertrofeerunud" :
+                               seinapaksus < limits[2] ? "keskmiselt hüpertrofeerunud" :
+                               "raskelt hüpertrofeerunud";
+            }
+
+            let edvi = 0, edvix = "PUUDU";
+            if (a.includes("MODbp/BSA:") && a[a.indexOf("MODbp/BSA:") - 1] === "EDV") {
+                edvi = safeParseFloat(a, a.indexOf("MODbp/BSA:") + 1, "MODbp/BSA");
+                const limits = sugu === "m" ? [74.5, 89.5, 100.5] : [61.5, 70.5, 80.5];
+                edvix = edvi < limits[0] ? "normaalse suurusega" :
+                        edvi < limits[1] ? "kergelt dilateerunud" :
+                        edvi < limits[2] ? "keskmiselt dilateerunud" :
+                        "raskelt dilateerunud";
+            }
+
+            let lvef = 60, lvefx = "PUUDU";
+            if (a.includes("EF(MOD-bp):")) {
+                lvef = safeParseFloat(a, a.indexOf("EF(MOD-bp):") + 1, "EF(MOD-bp)");
+                const limits = sugu === "m" ?  [51.4, 40.4, 30.4] : [53.4, 40.4, 30.4];
+                lvefx = lvef > limits[0] ? "normaalne" :
+                        lvef > limits[1] ? "kergelt langenud" :
+                        lvef > limits[2] ? "keskmiselt langenud" :
+                        "raskelt langenud";
+            }
+
+            let tapse = 2, rvs = 15;
+            if (a.includes("TAPSE:")) {
+                tapse = safeParseFloat(a, a.indexOf("TAPSE:") + 1, "TAPSE");
+            }
+
+            let ivcex = "PUUDU", ivcix = "normaalne", rap = 3;
+            if (a.includes("Exp:")) {
+                const ivce = safeParseFloat(a, a.indexOf("Exp:") + 1, "Exp");
+                ivcex = ivce < 2.1 ? "normaalse diameetriga" : "dilateerunud";
+                if (a.includes("Ins:")) {
+                    const ivci = safeParseFloat(a, a.indexOf("Ins:") + 1, "Ins");
+                    if (ivci / ivce > 0.5) {
+                        ivcix = "vähenenud";
+                    }
+                }
+                if (ivcex === "normaalse diameetriga" && ivcix === "normaalne") {
+                    rap = 3;
+                } else if (ivcex === "dilateerunud" && ivcix === "vähenenud") {
+                    rap = 15;
+                } else {
+                    rap = 8;
+                }
+            }
+
+            let laesvi = 0, laesvix = "PUUDU", bsa = 1.85;
+            if (a.includes("Indexed:")) {
+                laesvi = safeParseFloat(a, a.indexOf("Indexed:") + 1, "Indexed");
+                const laesv = safeParseFloat(a, a.indexOf("LAV(MOD-bp):") + 1, "LAV(MOD-bp)");
+                bsa = Math.round(laesv / laesvi * 100) / 100;
+                laesvix = laesvi < 35 ? "normaalse suurusega" :
+                          laesvi < 42 ? "kergelt dilateerunud" :
+                          laesvi < 48 ? "keskmiselt dilateerunud" :
+                          "raskelt dilateerunud";
+            }
+
+            let raesvi = 0, raesvix = "PUUDU";
+            if (a.includes("volume/BSA:")) {
+                raesvi = safeParseFloat(a, a.indexOf("volume/BSA:") + 1, "volume/BSA");
+                const limits = sugu === "m" ? 32.5 : 27.5;
+                raesvix = raesvi < limits ? "normaalse suurusega" : "dilateerunud";
+            }
+
+            let rvlongx = "PUUDU", trvel = 0, spapx = "ei ole hinnatav registreeritava trikuspidaalregurgitatsiooni puudumise tõttu";
+            let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0;
+            let j = 0;
+            for (let i = 0; i < a.length; i++) {
+                if (a[i] === "PG:" && a[i - 1] === "mean" && a[i - 2] === "Ao") {
+                    pgmean = safeParseFloat(a, i + 1, "PG mean");
+                }
+                if (a[i] === "VTI:" && a[i - 1] === "V1" && a[i - 2] === "LV") {
+                    lvotvti = safeParseFloat(a, i + 1, "VTI");
+                }
+                if (a[i] === "max:" && a[i - 1] === "V2" && a[i - 2] === "Ao") {
+                    vmax = safeParseFloat(a, i + 1, "V2 max");
+                }
+                if (a[i] === "area:" && a[i - 1] === "RA") {
+                    raarea = safeParseFloat(a, i + 1, "RA area");
+                }
+                if (a[i] === "E'" && a[i - 2] === "Lat") {
+                    elat = safeParseFloat(a, i + 2, "E' Lat");
+                }
+                if (a[i] === "E'" && a[i - 2] === "Med") {
+                    emed = safeParseFloat(a, i + 2, "E' Med");
+                }
+                if (a[i] === "vel:" && a[i - 1] === "max" && a[i - 2] === "TR") {
+                    trvel = safeParseFloat(a, i + 1, "TR vel max");
+                }
+                if (a[i] === "E" && a[i + 1] === "max" && a[i - 1] === "MV") {
+                    emax = safeParseFloat(a, i + 3, "E max");
+                }
+                if (a[i] === "PG:" && a[i - 1] === "max" && a[i - 2] === "TR") {
+                    const trpg = safeParseFloat(a, i + 1, "TR PG max");
+                    const spap = trpg + rap;
+                    spapx = spap > 35.5 ? `arvutuslikult hinnatuna tõusnud, sPAP ${Math.round(spap)} mmHg (TR max PG ${Math.round(trpg)} mmHg + RAP ${Math.round(rap)} mmHg)` :
+                            `arvutuslikult hinnatuna normaalne, sPAP ${Math.round(spap)} mmHg (TR max PG ${Math.round(trpg)} mmHg + RAP ${Math.round(rap)} mmHg)`;
+                }
+                if (a[i] === "RV" && a[i + 1] === "Peak") {
+                    rvs = safeParseFloat(a, i + 4, "RV Peak");
+                    rvlongx = tapse > 1.69 && rvs > 9.4 ? "normaalne" : "langenud";
+                }
+                if (a[i] === "VC_phl:" && a[i - 1] === "MR") {
+                    mrvc = safeParseFloat(a, i + 1, "MR VC_phl");
+                }
+                if (a[i] === "ERO:" && a[i - 1] === "MR") {
+                    mrero = safeParseFloat(a, i + 1, "MR ERO");
+                }
+                if (a[i] === "volume:" && a[i - 1] === "MR") {
+                    mrvol = safeParseFloat(a, i + 1, "MR volume");
+                }
+                if (a[i] === "PISA" && a[i - 1] === "MR") {
+                    mrvol = safeParseFloat(a, i + 2, "MR PISA");
+                }
+                if (a[i] === "radius:" && a[i - 1] === "PISA" && a[i - 2] === "MR") {
+                    mrpisa = safeParseFloat(a, i + 1, "MR PISA radius");
+                }
+                if (a[i] === "P1/2t:" && a[i - 1] === "AI") {
+                    aipht = safeParseFloat(a, i + 1, "AI P1/2t");
+                }
+                if (a[i] === "VC:" && a[i - 1] === "AR") {
+                    arvc = safeParseFloat(a, i + 1, "AR VC");
+                }
+                j++;
+            }
+
+            let k = 0, mpapx = "", pvx = " funktsioon normis";
+            for (let i = 0; i < a.length; i++) {
+                if (a[i] === "PG:" && a[i - 1] === "max" && a[i - 2] === "PI") {
+                    const prpg = safeParseFloat(a, i + 1, "PI PG max");
+                    pvx = "l kerge regurgitatsioon";
+                    if (spapx === "ei ole hinnatav registreeritava trikuspidaalregurgitatsiooni puudumise tõttu") {
+                        const mpap = prpg + rap;
+                        mpapx = mpap > 20.5 ? `Kopsuringe keskmine rõhk tõusnud, mPAP ${Math.round(mpap)} mmHg (PR max PG ${Math.round(prpg)} mmHg + RAP ${Math.round(rap)} mmHg). ` :
+                                `Kopsuringe keskmine rõhk normaalne, mPAP ${Math.round(mpap)} mmHg (PR max PG ${Math.round(prpg)} mmHg + RAP ${Math.round(rap)} mmHg). `;
+                    }
+                }
+                k++;
+            }
+
+            let dvi = 1, ava = 2;
+            if (a.includes("DVI:")) {
+                dvi = safeParseFloat(a, a.indexOf("DVI:") + 1, "DVI");
+            }
+            if (a.includes("AVA(I,D):")) {
+                ava = safeParseFloat(a, a.indexOf("AVA(I,D):") + 1, "AVA(I,D)");
+            }
+
+            let aort = "Aort PUUDU";
+            if (a.includes("asc") && (a.includes("sinus") || a.includes("root"))) {
+                const asc = safeParseFloat(a, a.indexOf("asc") + 3, "asc");
+                let sinus = 0;
+                if (a.includes("root")) {
+                    sinus = safeParseFloat(a, a.indexOf("root") + 2, "root");
+                }
+                if (a.includes("sinus")) {
+                    sinus = safeParseFloat(a, a.indexOf("sinus") + 2, "sinus");
+                }
+                const limit = 0.727273 * bsa + 2.65455;
+                if (asc > limit && sinus > limit) {
+                    aort = `Aordi bulbus (${sinus} cm) ja astsendeeruv aort (${asc} cm) on dilateerunud`;
+                } else if (asc > limit && sinus < limit) {
+                    aort = `Aordi bulbus normaalse diameetriga, astsendeeruv aort on dilateerunud (${asc} cm)`;
+                } else if (asc < limit && sinus > limit) {
+                    aort = `Aordi bulbus dilateerunud (${sinus} cm), astsendeeruv aort normaalse diameetriga`;
+                } else {
+                    aort = "Aordi bulbus ja astsendeeruv aort normaalse diameetriga";
+                }
+            } else if (!a.includes("asc") && (a.includes("sinus") || a.includes("root"))) {
+                let sinus = 0;
+                if (a.includes("root")) {
+                    sinus = safeParseFloat(a, a.indexOf("root") + 2, "root");
+                }
+                if (a.includes("sinus")) {
+                    sinus = safeParseFloat(a, a.indexOf("sinus") + 2, "sinus");
+                }
+                const limit = 0.727273 * bsa + 2.65455;
+                if (sinus > limit) {
+                    aort = `Aordi bulbus (${sinus} cm) on dilateerunud, astsendeeruv aort adekvaatselt ei visualiseeru`;
+                } else {
+                    aort = "Aordi bulbus on normaalse diameetriga, astsendeeruv aort adekvaatselt ei visualiseeru";
+                }
+            }
+
+            let facx = "visuaalselt normis";
+            if (a.includes("FAC:")) {
+                const fac = safeParseFloat(a, a.indexOf("FAC:") + 1, "FAC");
+                facx = fac < 35 ? `langenud (FAC ${Math.round(fac)}%)` : `normis (FAC ${Math.round(fac)}%)`;
+            }
+
+            let ea = 0;
+            if (a.includes("E/A:")) {
+                ea = safeParseFloat(a, a.indexOf("E/A:") + 1, "E/A");
+            }
+
+            let diastx = "PUUDU";
+            if (a.includes("E/lat") && a.includes("E/med")) {
+                const eelat = safeParseFloat(a, a.indexOf("E/lat") + 2, "E/lat");
+                const eemed = safeParseFloat(a, a.indexOf("E/med") + 2, "E/med");
+                const eesuhe = (eelat + eemed) / 2;
+                let h = 0;
+
+                if (lvefx === "normaalne") {
+                    if (eesuhe > 14) h++;
+                    if (elat < 10 || emed < 7) h++;
+                    if (trvel > 280) h++;
+                    if (laesvi > 34) h++;
+
+                    if (h < 2) diastx = "funktsioon normis";
+                    else if (h > 2) diastx = "düsfunktsioon";
+                    else diastx = "funktsioon ei ole hinnatav";
+                } else {
+                    if (ea > 1.99) {
+                        diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
+                    } else if (ea < 0.81 && ea > 0 && emax < 51) {
+                        diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
+                    } else {
+                        if (eesuhe > 14) h++;
+                        if (trvel > 280) h++;
+                        if (laesvi > 34) h++;
+
+                        if (h > 1) {
+                            diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
+                        } else if (h < 1) {
+                            diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
+                        } else {
+                            diastx = trvel > 0 ? "düsfunktsioon ilma rõhu tõusuta vasakus kojas" : "funktsioon ei ole hinnatav";
+                        }
+                    }
+                }
+            }
+
+            let asx = "klapi funktsioon normis";
+            if (vmax > 399.9 || pgmean > 39.9 || ava < 1.0 || dvi < 0.25) {
+                asx = `klapil raske stenoos (v(max) ${(vmax/100).toFixed(1)} m/s, PGmean ${Math.round(pgmean)} mmHg, AVA ${ava} cm², DVI ${dvi})`;
+            } else if (vmax > 299.9 || pgmean > 19.9 || ava < 1.51 || dvi < 0.51) {
+                asx = `klapil keskmise raskusega stenoos (v(max) ${(vmax/100).toFixed(1)} m/s, PGmean ${Math.round(pgmean)} mmHg, AVA ${ava} cm², DVI ${dvi})`;
+            } else if (vmax > 254.9) {
+                asx = `klapil kerge stenoos (v(max) ${(vmax/100).toFixed(1)} m/s, PGmean ${Math.round(pgmean)} mmHg, AVA ${ava} cm², DVI ${dvi})`;
+            }
+
+            let aix = "";
+            if (aipht > 0) {
+                if (asx === "klapi funktsioon normis") {
+                    if (aipht < 200 || arvc > 0.6) {
+                        asx = `klapil stenoosi ei esine, raske regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms)`;
+                    } else if (aipht < 500 || arvc > 0.3) {
+                        asx = `klapil stenoosi ei esine, keskmise raskusega regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms)`;
+                    } else {
+                        asx = "klapil stenoosi ei esine, kerge tsentraalne regurgitatsioon";
+                    }
+                } else {
+                    if (aipht < 200 || arvc > 0.6) {
+                        aix = ` ning raske regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms)`;
+                    } else if (aipht < 500 || arvc > 0.3) {
+                        aix = ` ning keskmise raskusega regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms)`;
+                    } else {
+                        aix = " ning kerge tsentraalne regurgitatsioon";
+                    }
+                }
+            }
+
+            let mrx = "minimaalne regurgitatsioon";
+            if (mrvc > 0.69 || mrpisa > 0.99 || mrero > 0.39 || mrvol > 59.9) {
+                mrx = `raske regurgitatsioon (VC laius ${mrvc} cm, PISAr ${mrpisa} cm, ERO ${mrero} cm²)`;
+            } else if (mrvc > 0.30 || mrpisa > 0.3 || mrero > 0.19 || mrvol > 29.9) {
+                mrx = `keskmine regurgitatsioon (VC laius ${mrvc} cm, PISAr ${mrpisa} cm, ERO ${mrero} cm²)`;
+            }
+
+            let rrx = "Kodade virvendusarütmia  x'";
+            if (a.includes("R-R:")) {
+                const rr = safeParseFloat(a, a.indexOf("R-R:") + 1, "R-R");
+                let esimene = Math.round(Math.round(60/rr / 10) * 10);
+                let teine = esimene > 60/rr ? esimene - 5 : esimene + 5;
+                rrx = `Siinusrütm ${Math.min(esimene, teine)}-${Math.max(esimene, teine)} x'`;
+            }
+
+            let straintekst = "", glsx = "";
+            if (a.includes("GLS_Endo_Peak_Avg:")) {
+                const gls = safeParseFloat(a, a.indexOf("GLS_Endo_Peak_Avg:") + 1, "GLS_Endo_Peak_Avg");
+                straintekst += " + LV strain";
+                if (gls < -18) {
+                    glsx = `Vasaku vatsakese globaalne longitudinaalne venitatavus ehk GLS on normis (${gls}%). `;
+                } else if (gls < -16) {
+                    glsx = `Vasaku vatsakese globaalne longitudinaalne venitatavus ehk GLS on kergelt langenud (${gls}%). `;
+                } else {
+                    glsx = `Vasaku vatsakese globaalne longitudinaalne venitatavus ehk GLS on langenud (${gls}%). `;
+                }
+            }
+
+            let rvstrainx = "";
+            if (a.includes("RVFWSL:")) {
+                const rvstrain = safeParseFloat(a, a.indexOf("RVFWSL:") + 1, "RVFWSL");
+                straintekst += " + RV strain";
+                if (rvstrain < -18) {
+                    rvstrainx = `Parema vatsakese vabaseina strain on normis (${rvstrain}%).`;
+                } else if (rvstrain < -16) {
+                    rvstrainx = `Parema vatsakese vabaseina strain on kergelt langenud (${rvstrain}%).`;
+                } else {
+                    rvstrainx = `Parema vatsakese vabaseina strain on langenud (${rvstrain}%).`;
+                }
+            }
+
+            let lastrainx = "";
+            if (a.includes("LASrED:")) {
+                const lastrain = safeParseFloat(a, a.indexOf("LASrED:") + 1, "LASrED");
+                straintekst += " + LA strain";
+                if (lastrain < 20) {
+                    lastrainx = `Vasaku koja strain oluliselt langenud (${lastrain}%).`;
+                    diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
+                } else if (lastrain < 35) {
+                    lastrainx = `Vasaku koja strain on langenud (${lastrain}%).`;
+                    diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
+                } else {
+                    lastrainx = `Vasaku koja strain on normis (${lastrain}%).`;
+                }
+            }
+
+            const result = `Täismahus ehhokardiograafia${straintekst}.
+
+Suboptimaalne nähtavus. ${rrx}.
+
+Vasaku vatsakese õõs ${edvix} (EDV MODbp/BSA ${Math.round(edvi)} ml/m²), müokard ${seinapaksusx}. Üldine süstoolne funktsioon on ${lvefx}, EF bp ${Math.round(lvef)}%, LVOT VTI ${Math.round(lvotvti)} cm. ${glsx}Segmentaarset kineetikahäiret ei tähelda.
+Diastoolne ${diastx}. ${lastrainx}
+
+Parem vatsake on ${rvbasex}, basaalne diameeter ${rvbase} cm. Longitudinaalne süstoolne funktsioon ${rvlongx} (TAPSE ${tapse.toFixed(1)} cm, RV S' ${rvs} cm/s), tsirkulaarne süstoolne funktsioon ${facx}. ${rvstrainx}
+Kopsuringe süstoolne rõhk ${spapx}. ${mpapx}
+Alumine õõnesveen ${ivcex}, respiratoorne reaktiivsus ${ivcix}.
+Vasak koda on ${laesvix} (LAESVi ${Math.round(laesvi)} ml/m²). Parem koda on ${raesvix} (RAESVi ${Math.round(raesvi)} ml/m², RA pindala ${Math.round(raarea)} cm²).
+Kodade vaheseinas šundivoolu ei visualiseeru.
+
+Aordiklapp on trikuspiidne, struktuur iseärasusteta, ${asx}${aix}.
+${aort}.
+Pulmonaalklapi${pvx}.
+Mitraalklapi struktuur iseärasusteta, ${mrx}.
+Trikuspidaalklapi struktuur iseärasusteta, minimaalne regurgitatsioon.
+
+Perikardiõõnes liigset vedelikku ei ole.`;
+
+            debugLog('Final result:', result);
+            return result;
+        }
+    </script>
+</body>
+</html>
