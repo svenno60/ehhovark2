@@ -105,9 +105,9 @@
             }
 
             let seinapaksusx = "PUUDU";
-            if (a.includes("IVSd:") && a.includes("LVPWd:")) {
-                const ivs = safeParseFloat(a, a.indexOf("IVSd:") + 1, "IVSd");
-                const pwt = safeParseFloat(a, a.indexOf("LVPWd:") + 1, "LVPWd");
+            if (a.includes("IVSd") && a.includes("LVPWd")) {
+                const ivs = safeParseFloat(a, a.indexOf("IVSd") + 1, "IVSd");
+                const pwt = safeParseFloat(a, a.indexOf("LVPWd") + 1, "LVPWd");
                 const seinapaksus = Math.max(ivs, pwt);
                 const limits = sugu === "m" ? [1.1, 1.35, 1.61] : [1, 1.25, 1.51];
                 seinapaksusx = seinapaksus < limits[0] ? "normaalse paksusega" :
@@ -117,8 +117,8 @@
             }
 
             let edvi = 0, edvix = "PUUDU";
-            if (a.includes("MODbp/BSA:") && a[a.indexOf("MODbp/BSA:") - 1] === "EDV") {
-                edvi = safeParseFloat(a, a.indexOf("MODbp/BSA:") + 1, "MODbp/BSA");
+            if (a.includes("LVEDVI") && a[a.indexOf("LVEDVI") + 2] === "BIP)") {
+                edvi = safeParseFloat(a, a.indexOf("LVEDVI") + 3, "LVEDVI");
                 const limits = sugu === "m" ? [74.5, 89.5, 100.5] : [61.5, 70.5, 80.5];
                 edvix = edvi < limits[0] ? "normaalse suurusega" :
                         edvi < limits[1] ? "kergelt dilateerunud" :
@@ -127,8 +127,8 @@
             }
 
             let lvef = 60, lvefx = "PUUDU";
-            if (a.includes("EF(MOD-bp):")) {
-                lvef = safeParseFloat(a, a.indexOf("EF(MOD-bp):") + 1, "EF(MOD-bp)");
+            if (a.includes("LVEF") && a[a.indexOf("LVEF") + 2] === "BIP)") {
+                lvef = safeParseFloat(a, a.indexOf("LVEF") + 3, "LVEF");
                 const limits = sugu === "m" ?  [51.4, 40.4, 30.4] : [53.4, 40.4, 30.4];
                 lvefx = lvef > limits[0] ? "normaalne" :
                         lvef > limits[1] ? "kergelt langenud" :
@@ -137,13 +137,13 @@
             }
 
             let tapse = 2, rvs = 15;
-            if (a.includes("TAPSE:")) {
-                tapse = safeParseFloat(a, a.indexOf("TAPSE:") + 1, "TAPSE");
+            if (a.includes("TAPSE")) {
+                tapse = safeParseFloat(a, a.indexOf("TAPSE") + 1, "TAPSE");
             }
 
             let ivcex = "PUUDU", ivcix = "normaalne", rap = 3;
-            if (a.includes("Exp:")) {
-                const ivce = safeParseFloat(a, a.indexOf("Exp:") + 1, "Exp");
+            if (a.includes("IVC")) {
+                const ivce = safeParseFloat(a, a.indexOf("IVC") + 1, "IVC");
                 ivcex = ivce < 2.1 ? "normaalse diameetriga" : "dilateerunud";
                 if (a.includes("Ins:")) {
                     const ivci = safeParseFloat(a, a.indexOf("Ins:") + 1, "Ins");
@@ -161,9 +161,9 @@
             }
 
             let laesvi = 0, laesvix = "PUUDU", bsa = 1.85;
-            if (a.includes("Indexed:")) {
-                laesvi = safeParseFloat(a, a.indexOf("Indexed:") + 1, "Indexed");
-                const laesv = safeParseFloat(a, a.indexOf("LAV(MOD-bp):") + 1, "LAV(MOD-bp)");
+            if (a.includes("LAESVI")) {
+                laesvi = safeParseFloat(a, a.indexOf("LAESVI") + 3, "LAESVI");
+                const laesv = safeParseFloat(a, a.indexOf("LAESV") + 3, "LAESV");
                 bsa = Math.round(laesv / laesvi * 100) / 100;
                 laesvix = laesvi < 35 ? "normaalse suurusega" :
                           laesvi < 42 ? "kergelt dilateerunud" :
@@ -172,8 +172,9 @@
             }
 
             let raesvi = 0, raesvix = "PUUDU";
-            if (a.includes("volume/BSA:")) {
-                raesvi = safeParseFloat(a, a.indexOf("volume/BSA:") + 1, "volume/BSA");
+            if (a.includes("RAESV")) {
+                raesv = safeParseFloat(a, a.indexOf("RAESV") + 2, "RAESV");
+                raesvi = raesv / bsa
                 const limits = sugu === "m" ? 32.5 : 27.5;
                 raesvix = raesvi < limits ? "normaalse suurusega" : "dilateerunud";
             }
@@ -185,11 +186,11 @@
                 if (a[i] === "PG:" && a[i - 1] === "mean" && a[i - 2] === "Ao") {
                     pgmean = safeParseFloat(a, i + 1, "PG mean");
                 }
-                if (a[i] === "VTI:" && a[i - 1] === "V1" && a[i - 2] === "LV") {
+                if (a[i] === "VTI" && a[i - 1] === "LVOT") {
                     lvotvti = safeParseFloat(a, i + 1, "VTI");
                 }
-                if (a[i] === "max:" && a[i - 1] === "V2" && a[i - 2] === "Ao") {
-                    vmax = safeParseFloat(a, i + 1, "V2 max");
+                if (a[i] === "Vmax" && a[i - 1] === "AV") {
+                    vmax = safeParseFloat(a, i + 1, "Vmax");
                 }
                 if (a[i] === "area:" && a[i - 1] === "RA") {
                     raarea = safeParseFloat(a, i + 1, "RA area");
@@ -200,20 +201,20 @@
                 if (a[i] === "E'" && a[i - 2] === "Med") {
                     emed = safeParseFloat(a, i + 2, "E' Med");
                 }
-                if (a[i] === "vel:" && a[i - 1] === "max" && a[i - 2] === "TR") {
-                    trvel = safeParseFloat(a, i + 1, "TR vel max");
+                if (a[i] === "Vmax" && a[i - 1] === "TR") {
+                    trvel = safeParseFloat(a, i + 1, "TR Vmax");
                 }
-                if (a[i] === "E" && a[i + 1] === "max" && a[i - 1] === "MV") {
-                    emax = safeParseFloat(a, i + 3, "E max");
+                if (a[i] === "Velocity" && a[i - 1] === "E" && a[i - 2] === "MV") {
+                    emax = safeParseFloat(a, i + 1, "MV E Velocity");
                 }
-                if (a[i] === "PG:" && a[i - 1] === "max" && a[i - 2] === "TR") {
-                    const trpg = safeParseFloat(a, i + 1, "TR PG max");
+                if (a[i] === "PG" && a[i - 1] === "max" && a[i - 2] === "TR") {
+                    const trpg = safeParseFloat(a, i + 1, "TR max PG");
                     const spap = trpg + rap;
                     spapx = spap > 35.5 ? `arvutuslikult hinnatuna tõusnud, sPAP ${Math.round(spap)} mmHg (TR max PG ${Math.round(trpg)} mmHg + RAP ${Math.round(rap)} mmHg)` :
                             `arvutuslikult hinnatuna normaalne, sPAP ${Math.round(spap)} mmHg (TR max PG ${Math.round(trpg)} mmHg + RAP ${Math.round(rap)} mmHg)`;
                 }
-                if (a[i] === "RV" && a[i + 1] === "Peak") {
-                    rvs = safeParseFloat(a, i + 4, "RV Peak");
+                if (a[i] === "S'" && a[i - 1] === "TV") {
+                    rvs = safeParseFloat(a, i + 1, "S'");
                     rvlongx = tapse > 1.69 && rvs > 9.4 ? "normaalne" : "langenud";
                 }
                 if (a[i] === "VC_phl:" && a[i - 1] === "MR") {
@@ -231,8 +232,8 @@
                 if (a[i] === "radius:" && a[i - 1] === "PISA" && a[i - 2] === "MR") {
                     mrpisa = safeParseFloat(a, i + 1, "MR PISA radius");
                 }
-                if (a[i] === "P1/2t:" && a[i - 1] === "AI") {
-                    aipht = safeParseFloat(a, i + 1, "AI P1/2t");
+                if (a[i] === "PHT" && a[i - 1] === "AR") {
+                    aipht = safeParseFloat(a, i + 1, "AR PHT");
                 }
                 if (a[i] === "VC:" && a[i - 1] === "AR") {
                     arvc = safeParseFloat(a, i + 1, "AR VC");
@@ -255,22 +256,22 @@
             }
 
             let dvi = 1, ava = 2;
-            if (a.includes("DVI:")) {
-                dvi = safeParseFloat(a, a.indexOf("DVI:") + 1, "DVI");
+            if (a.includes("Dimensionless")) {
+                dvi = safeParseFloat(a, a.indexOf("Dimensionless") + 2, "Dimensionless");
             }
             if (a.includes("AVA(I,D):")) {
                 ava = safeParseFloat(a, a.indexOf("AVA(I,D):") + 1, "AVA(I,D)");
             }
 
             let aort = "Aort PUUDU";
-            if (a.includes("asc") && (a.includes("sinus") || a.includes("root"))) {
-                const asc = safeParseFloat(a, a.indexOf("asc") + 3, "asc");
+            if (a.includes("Asc") && (a.includes("Root") || a.includes("root"))) {
+                const asc = safeParseFloat(a, a.indexOf("Asc") + 2, "Asc");
                 let sinus = 0;
                 if (a.includes("root")) {
                     sinus = safeParseFloat(a, a.indexOf("root") + 2, "root");
                 }
-                if (a.includes("sinus")) {
-                    sinus = safeParseFloat(a, a.indexOf("sinus") + 2, "sinus");
+                if (a.includes("Root")) {
+                    sinus = safeParseFloat(a, a.indexOf("Root") + 2, "Root");
                 }
                 const limit = 0.727273 * bsa + 2.65455;
                 if (asc > limit && sinus > limit) {
@@ -282,13 +283,13 @@
                 } else {
                     aort = "Aordi bulbus ja astsendeeruv aort normaalse diameetriga";
                 }
-            } else if (!a.includes("asc") && (a.includes("sinus") || a.includes("root"))) {
+            } else if (!a.includes("Asc") && (a.includes("Root") || a.includes("root"))) {
                 let sinus = 0;
                 if (a.includes("root")) {
                     sinus = safeParseFloat(a, a.indexOf("root") + 2, "root");
                 }
-                if (a.includes("sinus")) {
-                    sinus = safeParseFloat(a, a.indexOf("sinus") + 2, "sinus");
+                if (a.includes("Root")) {
+                    sinus = safeParseFloat(a, a.indexOf("Root") + 2, "Root");
                 }
                 const limit = 0.727273 * bsa + 2.65455;
                 if (sinus > limit) {
@@ -305,8 +306,8 @@
             }
 
             let ea = 0;
-            if (a.includes("E/A:")) {
-                ea = safeParseFloat(a, a.indexOf("E/A:") + 1, "E/A");
+            if (a.includes("/") && a[a.indexOf("/") - 1] === "E" && a[a.indexOf("/") + 1] === "A") {
+                ea = safeParseFloat(a, a.indexOf("/") + 2, "/");
             }
 
             let diastx = "PUUDU";
