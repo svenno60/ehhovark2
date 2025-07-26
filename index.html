@@ -99,8 +99,8 @@
             }
 
             let rvbase = 0, rvbasex = "PUUDU";
-            if (a.includes("RVDd:")) {
-                rvbase = safeParseFloat(a, a.indexOf("RVDd:") + 1, "RVDd");
+            if (a.includes("basal")) {
+                rvbase = safeParseFloat(a, a.indexOf("basal") + 1, "basal");
                 rvbasex = rvbase < 4.15 ? "normaalse suurusega" : "dilateerunud";
             }
 
@@ -183,8 +183,8 @@
             let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0;
             let j = 0;
             for (let i = 0; i < a.length; i++) {
-                if (a[i] === "PG:" && a[i - 1] === "mean" && a[i - 2] === "Ao") {
-                    pgmean = safeParseFloat(a, i + 1, "PG mean");
+                if (a[i] === "PG" && a[i - 1] === "mean" && a[i - 2] === "AV") {
+                    pgmean = safeParseFloat(a, i + 1, "AV mean PG");
                 }
                 if (a[i] === "VTI" && a[i - 1] === "LVOT") {
                     lvotvti = safeParseFloat(a, i + 1, "VTI");
@@ -259,8 +259,8 @@
             if (a.includes("Dimensionless")) {
                 dvi = safeParseFloat(a, a.indexOf("Dimensionless") + 2, "Dimensionless");
             }
-            if (a.includes("AVA(I,D):")) {
-                ava = safeParseFloat(a, a.indexOf("AVA(I,D):") + 1, "AVA(I,D)");
+            if (a.includes("AVA") && a[a.indexOf("AVA") + 1] === "(VTI)") {
+                ava = safeParseFloat(a, a.indexOf("AVA") + 2, "AVA");
             }
 
             let aort = "Aort PUUDU";
@@ -385,9 +385,9 @@
             }
 
             let rrx = "Kodade virvendusarütmia  x'";
-            if (a.includes("R-R:")) {
-                const rr = safeParseFloat(a, a.indexOf("R-R:") + 1, "R-R");
-                let esimene = Math.round(Math.round(60/rr / 10) * 10);
+            if (a.includes("HR") && a[a.indexOf("HR") - 1] === "AV") {
+                const rr = safeParseFloat(a, a.indexOf("HR") + 1, "HR");
+                let esimene = Math.round(rr);
                 let teine = esimene > 60/rr ? esimene - 5 : esimene + 5;
                 rrx = `Siinusrütm ${Math.min(esimene, teine)}-${Math.max(esimene, teine)} x'`;
             }
