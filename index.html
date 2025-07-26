@@ -243,8 +243,8 @@
 
             let k = 0, mpapx = "", pvx = " funktsioon normis";
             for (let i = 0; i < a.length; i++) {
-                if (a[i] === "PG:" && a[i - 1] === "max" && a[i - 2] === "PI") {
-                    const prpg = safeParseFloat(a, i + 1, "PI PG max");
+                if (a[i] === "maxPG" && a[i - 1] === "PRearly") {
+                    const prpg = safeParseFloat(a, i + 1, "PRearly maxPG");
                     pvx = "l kerge regurgitatsioon";
                     if (spapx === "ei ole hinnatav registreeritava trikuspidaalregurgitatsiooni puudumise tõttu") {
                         const mpap = prpg + rap;
@@ -311,9 +311,9 @@
             }
 
             let diastx = "PUUDU";
-            if (a.includes("E/lat") && a.includes("E/med")) {
-                const eelat = safeParseFloat(a, a.indexOf("E/lat") + 2, "E/lat");
-                const eemed = safeParseFloat(a, a.indexOf("E/med") + 2, "E/med");
+            if (a.includes("Sept") && a.includes("Lat")) {
+                const eelat = safeParseFloat(a, a.indexOf("Lat") + 1, "Lat");
+                const eemed = safeParseFloat(a, a.indexOf("Sept") + 1, "Sept");
                 const eesuhe = (eelat + eemed) / 2;
                 let h = 0;
 
@@ -437,13 +437,13 @@
 
 Suboptimaalne nähtavus. ${rrx}.
 
-Vasaku vatsakese õõs ${edvix} (EDV MODbp/BSA ${Math.round(edvi)} ml/m²), müokard ${seinapaksusx}. Üldine süstoolne funktsioon on ${lvefx}, EF bp ${Math.round(lvef)}%, LVOT VTI ${Math.round(lvotvti)} cm. ${glsx}Segmentaarset kineetikahäiret ei tähelda.
+Vasaku vatsakese õõs ${edvix}, müokard ${seinapaksusx}. Üldine süstoolne funktsioon on ${lvefx}, EF bp ${Math.round(lvef)}%, LVOT VTI ${Math.round(lvotvti)} cm. ${glsx}Veenvat segmentaarset kineetikahäiret ei tähelda.
 Diastoolne ${diastx}. ${lastrainx}
 
-Parem vatsake on ${rvbasex}, basaalne diameeter ${rvbase} cm. Longitudinaalne süstoolne funktsioon ${rvlongx} (TAPSE ${tapse.toFixed(1)} cm, RV S' ${rvs} cm/s), tsirkulaarne süstoolne funktsioon ${facx}. ${rvstrainx}
+Parem vatsake on ${rvbasex}. Longitudinaalne süstoolne funktsioon ${rvlongx} (TAPSE ${tapse.toFixed(1)} cm, RV S' ${rvs} cm/s), tsirkulaarne süstoolne funktsioon ${facx}. ${rvstrainx}
 Kopsuringe süstoolne rõhk ${spapx}. ${mpapx}
 Alumine õõnesveen ${ivcex}, respiratoorne reaktiivsus ${ivcix}.
-Vasak koda on ${laesvix} (LAESVi ${Math.round(laesvi)} ml/m²). Parem koda on ${raesvix} (RAESVi ${Math.round(raesvi)} ml/m², RA pindala ${Math.round(raarea)} cm²).
+Vasak koda on ${laesvix}. Parem koda on ${raesvix}.
 Kodade vaheseinas šundivoolu ei visualiseeru.
 
 Aordiklapp on trikuspiidne, struktuur iseärasusteta, ${asx}${aix}.
