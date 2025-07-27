@@ -162,8 +162,8 @@
             }
 
             let laesvi = 0, laesvix = "PUUDU", bsa = 1.85;
-            if (a.includes("LVEF (MOD BIP)")) {
-                laesvi = safeParseFloat(a, a.indexOf("LVEF (MOD BIP)") + 1, "LAESVI");
+            if (a.includes("LAESVI (MOD BIP)")) {
+                laesvi = safeParseFloat(a, a.indexOf("LAESVI (MOD BIP)") + 1, "LAESVI");
                 const laesv = safeParseFloat(a, a.indexOf("LAESV (MOD BIP)") + 1, "LAESV");
                 bsa = Math.round(laesv / laesvi * 100) / 100; // võib jamada
                 laesvix = laesvi < 35 ? "normaalse suurusega" :
