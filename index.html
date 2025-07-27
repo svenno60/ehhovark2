@@ -77,7 +77,6 @@
             debugLog('Starting report generation');
             const b = userInput.replace(/,/g, "."); // Replace comma decimals with dot
             const a = b.split(/\r?\n/).map(line => line.trim()).filter(line => line); // Split by line breaks
-            document.getElementById('parsedArray').textContent = JSON.stringify(a, null, 2);
             debugLog('Input split into array:', a);
 
             // Wrap value parsing in try-catch
