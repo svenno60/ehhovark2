@@ -100,8 +100,8 @@
             }
 
             let rvbase = 0, rvbasex = "PUUDU"; // veel vana
-            if (a.includes("basal")) {
-                rvbase = safeParseFloat(a, a.indexOf("basal") + 1, "basal");
+            if (a.includes("RV basal")) {
+                rvbase = safeParseFloat(a, a.indexOf("RV basal") + 1, "RV basal");
                 rvbasex = rvbase < 4.15 ? "normaalse suurusega" : "dilateerunud";
             }
 
