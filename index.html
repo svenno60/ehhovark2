@@ -348,7 +348,7 @@
                 }
             }
 
-            let asx = "klapi funktsioon normis";
+            let asx = "klapi funktsioon normis"; // kui pgmean kõrge, ikka ei anna stenoosi millegipärast
             if (vmax > 3.99 || pgmean > 39.9 || ava < 1.0 || dvi < 0.25) {
                 asx = `klapil raske stenoos (v(max) ${vmax.toFixed(1)} m/s, PGmean ${Math.round(pgmean)} mmHg, AVA ${ava} cm², DVI ${dvi})`;
             } else if (vmax > 2.99 || pgmean > 19.9 || ava < 1.51 || dvi < 0.51) {
