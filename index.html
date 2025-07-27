@@ -208,7 +208,7 @@
                 if (a[i] === "MV E Velocity") {
                     emax = safeParseFloat(a, i + 1, "MV E Velocity");
                 }
-                if (a[i] === "TR max PG") {
+                if (a[i] === "TR max PG") {
                     const trpg = safeParseFloat(a, i + 1, "TR max PG");
                     const spap = trpg + rap;
                     spapx = spap > 35.5 ? `arvutuslikult hinnatuna tõusnud, sPAP ${Math.round(spap)} mmHg (TR max PG ${Math.round(trpg)} mmHg + RAP ${Math.round(rap)} mmHg)` :
