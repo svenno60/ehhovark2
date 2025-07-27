@@ -75,7 +75,8 @@
 
         function generateReport(sugu, userInput) {
             debugLog('Starting report generation');
-            const a = userInput.split(/\s+/);
+            const b = userInput.replace(/,/g, ".");
+            const a = b.split(/\s+/);
             debugLog('Input split into array:', a);
 
             // Wrap value parsing in try-catch
