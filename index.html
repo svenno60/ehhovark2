@@ -388,7 +388,7 @@
             let rrx = "Kodade virvendusarütmia  x'";
             if (a.includes("AV HR")) {
                 const rr = safeParseFloat(a, a.indexOf("AV HR") + 1, "AV HR");
-                let esimene = Math.round(rr);
+                let esimene = Math.ceil(rr / 5) * 5;
                 let teine = esimene > 60/rr ? esimene - 5 : esimene + 5;
                 rrx = `Siinusrütm ${Math.min(esimene, teine)}-${Math.max(esimene, teine)} x'`;
             }
