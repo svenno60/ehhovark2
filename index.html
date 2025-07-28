@@ -99,7 +99,7 @@
                 }
             }
 
-            let rvbase = 0, rvbasex = "PUUDU"; // veel vana
+            let rvbase = 0, rvbasex = "PUUDU"; 
             if (a.includes("RV basal")) {
                 rvbase = safeParseFloat(a, a.indexOf("RV basal") + 1, "RV basal");
                 rvbasex = rvbase < 4.15 ? "normaalse suurusega" : "dilateerunud";
@@ -143,11 +143,11 @@
             }
 
             let ivcex = "PUUDU", ivcix = "normaalne", rap = 3;
-            if (a.includes("IVC")) {
-                const ivce = safeParseFloat(a, a.indexOf("IVC") + 1, "IVC");
+            if (a.includes("IVC Diam Exp")) {
+                const ivce = safeParseFloat(a, a.indexOf("IVC Diam Exp") + 1, "IVC Diam Exp");
                 ivcex = ivce < 2.1 ? "normaalse diameetriga" : "dilateerunud";
-                if (a.includes("Ins:")) { // vana
-                    const ivci = safeParseFloat(a, a.indexOf("Ins:") + 1, "Ins");
+                if (a.includes("IVC Diam Ins")) {
+                    const ivci = safeParseFloat(a, a.indexOf("IVC Diam Ins") + 1, "IVC Diam Ins");
                     if (ivci / ivce > 0.5) {
                         ivcix = "vähenenud";
                     }
@@ -173,9 +173,8 @@
             }
 
             let raesvi = 0, raesvix = "PUUDU";
-            if (a.includes("RAESV (MOD)")) {
-                raesv = safeParseFloat(a, a.indexOf("RAESV (MOD)") + 1, "RAESV");
-                raesvi = raesv / bsa // võib jamada
+            if (a.includes("RAVindex")) {
+                raesvi = safeParseFloat(a, a.indexOf("RAVindex") + 1, "RAVindex");
                 const limits = sugu === "m" ? 32.5 : 27.5;
                 raesvix = raesvi < limits ? "normaalse suurusega" : "dilateerunud";
             }
@@ -196,11 +195,11 @@
                 if (a[i] === "area:" && a[i - 1] === "RA") { // vana
                     raarea = safeParseFloat(a, i + 1, "RA area");
                 }
-                if (a[i] === "E'" && a[i - 2] === "Lat") { // vana
-                    elat = safeParseFloat(a, i + 2, "E' Lat");
+                if (a[i] === "MV E' Lat") { 
+                    elat = safeParseFloat(a, i + 1, "MV E' Lat");
                 }
-                if (a[i] === "E'" && a[i - 2] === "Med") { // vana
-                    emed = safeParseFloat(a, i + 2, "E' Med");
+                if (a[i] === "MV E' Sept") { 
+                    emed = safeParseFloat(a, i + 1, "MV E' Sept");
                 }
                 if (a[i] === "TR Vmax") {
                     trvel = safeParseFloat(a, i + 1, "TR Vmax");
@@ -218,26 +217,23 @@
                     rvs = safeParseFloat(a, i + 1, "TV S'");
                     rvlongx = tapse > 1.69 && rvs > 9.4 ? "normaalne" : "langenud";
                 }
-                if (a[i] === "VC_phl:" && a[i - 1] === "MR") { // vana
-                    mrvc = safeParseFloat(a, i + 1, "MR VC_phl");
+                if (a[i] === "MR vena contracta") { 
+                    mrvc = safeParseFloat(a, i + 1, "MR vena contracta");
                 }
-                if (a[i] === "ERO:" && a[i - 1] === "MR") { // vana
+                if (a[i] === "MR ERO") { 
                     mrero = safeParseFloat(a, i + 1, "MR ERO");
                 }
-                if (a[i] === "volume:" && a[i - 1] === "MR") { // vana
-                    mrvol = safeParseFloat(a, i + 1, "MR volume");
+                if (a[i] === "MR RV") {
+                    mrvol = safeParseFloat(a, i + 1, "MR RV");
                 }
-                if (a[i] === "PISA" && a[i - 1] === "MR") { // vana
-                    mrvol = safeParseFloat(a, i + 2, "MR PISA");
-                }
-                if (a[i] === "radius:" && a[i - 1] === "PISA" && a[i - 2] === "MR") { // vana
-                    mrpisa = safeParseFloat(a, i + 1, "MR PISA radius");
+                if (a[i] === "MR Rad") { 
+                    mrpisa = safeParseFloat(a, i + 1, "MR Rad");
                 }
                 if (a[i] === "AR PHT") {
                     aipht = safeParseFloat(a, i + 1, "AR PHT");
                 }
-                if (a[i] === "VC:" && a[i - 1] === "AR") { // vana
-                    arvc = safeParseFloat(a, i + 1, "AR VC");
+                if (a[i] === "AR v. contracta") { 
+                    arvc = safeParseFloat(a, i + 1, "AR v. contracta");
                 }
                 j++;
             }
@@ -312,10 +308,8 @@
             }
 
             let diastx = "PUUDU";
-            if (a.includes("Sept") && a.includes("Lat")) { // vana
-                const eelat = safeParseFloat(a, a.indexOf("Lat") + 1, "Lat");
-                const eemed = safeParseFloat(a, a.indexOf("Sept") + 1, "Sept");
-                const eesuhe = (eelat + eemed) / 2;
+            if (a.includes("MV E / E' Avg")) { 
+                const eesuhe = safeParseFloat(a, a.indexOf("MV E / E' Avg") + 1, "MV E / E' Avg");
                 let h = 0;
 
                 if (lvefx === "normaalne") {
