@@ -344,11 +344,11 @@
 
             let asx = "klapi funktsioon normis"; 
             if (vmax > 3.99 || pgmean > 39.9 || ava < 1.0 || dvi < 0.25) {
-                asx = `klapil raske stenoos (v(max) ${vmax.toFixed(1)} m/s, PGmean ${Math.round(pgmean)} mmHg, AVA ${ava} cm², DVI ${dvi})`;
+                asx = `klapil raske stenoos (v(max) ${vmax.toFixed(1)} m/s, PGmean ${Math.round(pgmean)} mmHg, AVA ${ava.toFixed(1)} cm², DVI ${dvi})`;
             } else if (vmax > 2.99 || pgmean > 19.9 || ava < 1.51 || dvi < 0.51) {
-                asx = `klapil keskmise raskusega stenoos (v(max) ${vmax.toFixed(1)} m/s, PGmean ${Math.round(pgmean)} mmHg, AVA ${ava} cm², DVI ${dvi})`;
+                asx = `klapil keskmise raskusega stenoos (v(max) ${vmax.toFixed(1)} m/s, PGmean ${Math.round(pgmean)} mmHg, AVA ${ava.toFixed(1)} cm², DVI ${dvi})`;
             } else if (vmax > 2.54) {
-                asx = `klapil kerge stenoos (v(max) ${vmax.toFixed(1)} m/s, PGmean ${Math.round(pgmean)} mmHg, AVA ${ava} cm², DVI ${dvi})`;
+                asx = `klapil kerge stenoos (v(max) ${vmax.toFixed(1)} m/s, PGmean ${Math.round(pgmean)} mmHg, AVA ${ava.toFixed(1)} cm², DVI ${dvi})`;
             }
 
             let aix = "";
