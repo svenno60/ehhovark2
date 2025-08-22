@@ -297,8 +297,8 @@
             }
 
             let facx = "visuaalselt normis"; // vana
-            if (a.includes("FAC:")) {
-                const fac = safeParseFloat(a, a.indexOf("FAC:") + 1, "FAC");
+            if (a.includes("RV FAC")) {
+                const fac = safeParseFloat(a, a.indexOf("RV FAC") + 1, "RV FAC");
                 facx = fac < 35 ? `langenud (FAC ${Math.round(fac)}%)` : `normis (FAC ${Math.round(fac)}%)`;
             }
 
