@@ -76,10 +76,10 @@
         function generateReport(sugu, userInput) {
             debugLog('Starting report generation');
             const b = userInput.replace(/,/g, "."); // Replace comma decimals with dot
-            b = b.replace(/\uFFFC/g, "");; // võtab lollid väiksed noolekesed ära
-            b = b.replace(/\u00A0/g, " ")  // non-breaking space
-                 .replace(/\u202F/g, " ")  // narrow no-break space
-                 .replace(/\s+/g, " ");    // collapse weird whitespace
+            const b = b.replace(/\uFFFC/g, "");; // võtab lollid väiksed noolekesed ära
+            const b = b.replace(/\u00A0/g, " ")  // non-breaking space
+            const b = b.replace(/\u202F/g, " ")  // narrow no-break space
+            const b = b.replace(/\s+/g, " ");    // collapse weird whitespace
             const a = b.split(/\r?\n/).map(line => line.trim()).filter(line => line); // Split by line breaks
             debugLog('Input split into array:', a);
 
