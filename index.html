@@ -76,7 +76,7 @@
         function generateReport(sugu, userInput) {
             debugLog('Starting report generation');
             const b = userInput.replace(/,/g, "."); // Replace comma decimals with dot
-            const b = b.filter(item => item !== "￼"); // Remove all "￼" elements
+            //const b = b.filter(item => item !== "￼"); // Remove all "￼" elements
             const a = b.split(/\r?\n/).map(line => line.trim()).filter(line => line); // Split by line breaks
             debugLog('Input split into array:', a);
 
