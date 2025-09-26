@@ -75,12 +75,19 @@
 
         function generateReport(sugu, userInput) {
             debugLog('Starting report generation');
-            let b = userInput.replace(/,/g, "."); // Replace comma decimals with dot
+            /* let b = userInput.replace(/,/g, "."); // Replace comma decimals with dot
             b = b.replace(/\uFFFC/g, "");; // võtab lollid väiksed noolekesed ära
             b = b.replace(/\u00A0/g, " ")  // non-breaking space
             b = b.replace(/\u202F/g, " ")  // narrow no-break space
             b = b.replace(/\s+/g, " ");    // collapse weird whitespace
-            const a = b.split(/\r?\n/).map(line => line.trim()).filter(line => line); // Split by line breaks
+            const a = b.split(/\r?\n/).map(line => line.trim()).filter(line => line); // Split by line breaks */
+            let b = userInput.replace(/,/g, ".")
+                 .replace(/\uFFFC/g, "")
+                 .replace(/\u00A0/g, " ")
+                 .replace(/\u202F/g, " ");
+            let a = b.split(/\r?\n/)              // keep lines intact
+                     .map(line => line.trim().replace(/\s+/g, " ")) // normalize spaces inside each line
+                     .filter(line => line);
             debugLog('Input split into array:', a);
 
             // Wrap value parsing in try-catch
