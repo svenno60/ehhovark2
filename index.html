@@ -157,7 +157,7 @@
             if (a.includes("IVC Diam Exp")) {
                 const ivce = safeParseFloat(a, a.indexOf("IVC Diam Exp") + 1, "IVC Diam Exp");
                 ivcex = ivce < 2.1 ? "normaalse diameetriga" : "dilateerunud";
-                if (a.includes("IVC Diam Ins")) {
+                if (a.includes("IVC Diam Ins")) {
                     const ivci = safeParseFloat(a, a.indexOf("IVC Diam Ins") + 1, "IVC Diam Ins");
                     if (ivci / ivce > 0.5) {
                         ivcix = "vähenenud";
@@ -194,7 +194,7 @@
             let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0;
             let j = 0;
             for (let i = 0; i < a.length; i++) {
-                if (a[i] === "AV mean PG") {
+                if (a[i] === "AV mean PG") {
                     pgmean = safeParseFloat(a, i + 1, "AV mean PG");
                 }
                 if (a[i] === "LVOT VTI") {
@@ -218,7 +218,7 @@
                 if (a[i] === "MV E Velocity") {
                     emax = safeParseFloat(a, i + 1, "MV E Velocity");
                 }
-                if (a[i] === "TR max PG") {
+                if (a[i] === "TR max PG") {
                     const trpg = safeParseFloat(a, i + 1, "TR max PG");
                     const spap = trpg + rap;
                     spapx = spap > 35.5 ? `arvutuslikult hinnatuna tõusnud, sPAP ${Math.round(spap)} mmHg (TR max PG ${Math.round(trpg)} mmHg + RAP ${Math.round(rap)} mmHg)` :
