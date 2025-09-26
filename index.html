@@ -319,8 +319,11 @@
             }
 
             let diastx = "PUUDU";
-            if (a.includes("MV E / E' Avg")) { 
-                const eesuhe = safeParseFloat(a, a.indexOf("MV E / E' Avg") + 1, "MV E / E' Avg");
+            if (a.includes("MV E / E' Sept") && a.includes("MV E / E' Lat")) { 
+                // const eesuhe = safeParseFloat(a, a.indexOf("MV E / E' Avg") + 1, "MV E / E' Avg");
+                const eesept = safeParseFloat(a, a.indexOf("MV E / E' Sept") + 1, "MV E / E' Sept");
+                const eelat = safeParseFloat(a, a.indexOf("MV E / E' Lat") + 1, "MV E / E' Lat");
+                const eesuhe = (eesept + eelat) / 2;
                 let h = 0;
 
                 if (lvefx === "normaalne") {
