@@ -158,7 +158,7 @@
                 const ivce = safeParseFloat(a, a.indexOf("IVC Diam Exp") + 1, "IVC Diam Exp");
                 ivcex = ivce < 2.1 ? "normaalse diameetriga" : "dilateerunud";
                 if (a.includes("IVC Diam Ins")) {
-                    const ivci = safeParseFloat(a, a.indexOf("IVC Diam Ins") + 1, "IVC Diam Ins");
+                    const ivci = safeParseFloat(a, a.indexOf("IVC Diam Ins") + 1, "IVC Diam Ins");
                     if (ivci / ivce > 0.5) {
                         ivcix = "vähenenud";
                     }
