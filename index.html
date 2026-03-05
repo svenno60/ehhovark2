@@ -191,7 +191,7 @@
             }
 
             let rvlongx = "PUUDU", trvel = 0, spapx = "ei ole hinnatav registreeritava trikuspidaalregurgitatsiooni puudumise tõttu";
-            let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0;
+            let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0, mvpgmean = 0, mvava = 3, mvvti = 0;
             let j = 0;
             for (let i = 0; i < a.length; i++) {
                 if (a[i] === "AV mean PG") {
@@ -245,6 +245,15 @@
                 }
                 if (a[i] === "AR v. contracta") { 
                     arvc = safeParseFloat(a, i + 1, "AR v. contracta");
+                }
+                if (a[i] === "MV mean PG") { 
+                    mvpgmean = safeParseFloat(a, i + 1, "MV mean PG");
+                }
+                if (a[i] === "MVA (VTI)") { 
+                    mvava = safeParseFloat(a, i + 1, "MVA (VTI)");
+                }
+                if (a[i] === "MV VTI") { 
+                    mvvti = safeParseFloat(a, i + 1, "MV VTI");
                 }
                 j++;
             }
@@ -386,6 +395,13 @@
                 }
             }
 
+            let msx = "";
+            if (mvpgmean > 9.50 || mvava < 1.6) {
+                msx = `raske stenoos (PGmean ${Math.round(mvpgmean)} mmHg, MVA ${mvava} cm²), `;
+            } else if (mvpgmean > 4.50 || mvava < 2.6) {
+                msx = `keskmine stenoos (PGmean ${Math.round(mvpgmean)} mmHg, MVA ${mvava} cm²), `;
+            }
+            
             let mrx = "minimaalne regurgitatsioon";
             if (mrvc > 0.69 || mrpisa > 0.99 || mrero > 0.39 || mrvol > 59.9) {
                 mrx = `raske regurgitatsioon (VC laius ${mrvc} cm, PISAr ${mrpisa} cm, ERO ${mrero} cm²)`;
@@ -458,7 +474,7 @@ Kodade vaheseinas šundivoolu ei visualiseeru.
 Aordiklapp on trikuspiidne, struktuur iseärasusteta, ${asx}${aix}.
 ${aort}.
 Pulmonaalklapi${pvx}.
-Mitraalklapi struktuur iseärasusteta, ${mrx}.
+Mitraalklapi struktuur iseärasusteta, ${msx}${mrx}.
 Trikuspidaalklapi struktuur iseärasusteta, minimaalne regurgitatsioon.
 
 Perikardiõõnes liigset vedelikku ei ole.`;
