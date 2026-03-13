@@ -191,7 +191,7 @@
             }
 
             let rvlongx = "PUUDU", trvel = 0, spapx = "ei ole hinnatav registreeritava trikuspidaalregurgitatsiooni puudumise tõttu";
-            let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0, mvpgmean = 0, mvava = 3, mvvti = 0;
+            let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0, arero = 0, arrv = 0, mvpgmean = 0, mvava = 3, mvvti = 0;
             let j = 0;
             for (let i = 0; i < a.length; i++) {
                 if (a[i] === "AV mean PG") {
@@ -246,9 +246,19 @@
                 if (a[i] === "AR VC Diam") { 
                     arvc = safeParseFloat(a, i + 1, "AR VC Diam");
                 }
+            
+                if (a[i] === "AR ERO") { 
+                    arero = safeParseFloat(a, i + 1, "AR ERO");
+                }
+                
+                if (a[i] === "AR RV") { 
+                    arrv = safeParseFloat(a, i + 1, "AR RV");
+                }
+                
                 if (a[i] === "MV mean PG") { 
                     mvpgmean = safeParseFloat(a, i + 1, "MV mean PG");
                 }
+                
                 if (a[i] === "MVA (VTI)") { 
                     mvava = safeParseFloat(a, i + 1, "MVA (VTI)");
                 }
@@ -377,18 +387,18 @@
             let aix = "";
             if (aipht > 0) {
                 if (asx === "klapi funktsioon normis") {
-                    if (aipht < 200 || arvc > 0.6) {
-                        asx = `klapil stenoosi ei esine, raske regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms)`;
-                    } else if (aipht < 500 || arvc > 0.3) {
-                        asx = `klapil stenoosi ei esine, keskmise raskusega regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms)`;
+                    if (aipht < 200 || arvc > 0.6 || arero > 0.29 || arrv > 59) {
+                        asx = `klapil stenoosi ei esine, raske regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms, ERO ${arero} cm², RV ${arrv} ml)`;
+                    } else if (aipht < 500 || arvc > 0.3 || arero > 0.09 || arrv > 29) {
+                        asx = `klapil stenoosi ei esine, keskmise raskusega regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms, ERO ${arero} cm², RV ${arrv} ml)`;
                     } else {
                         asx = "klapil stenoosi ei esine, kerge tsentraalne regurgitatsioon";
                     }
                 } else {
-                    if (aipht < 200 || arvc > 0.6) {
-                        aix = ` ning raske regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms)`;
-                    } else if (aipht < 500 || arvc > 0.3) {
-                        aix = ` ning keskmise raskusega regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms)`;
+                    if (aipht < 200 || arvc > 0.6 || arero > 0.29 || arrv > 59) {
+                        aix = ` ning raske regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms, ERO ${arero} cm², RV ${arrv} ml)`;
+                    } else if (aipht < 500 || arvc > 0.3 || arero > 0.09 || arrv > 29) {
+                        aix = ` ning keskmise raskusega regurgitatsioon (VC laius ${arvc} cm, PHT ${Math.round(aipht)} ms, ERO ${arero} cm², RV ${arrv} ml)`;
                     } else {
                         aix = " ning kerge tsentraalne regurgitatsioon";
                     }
