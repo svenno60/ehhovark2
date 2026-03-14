@@ -191,7 +191,7 @@
             }
 
             let rvlongx = "PUUDU", trvel = 0, spapx = "ei ole hinnatav registreeritava trikuspidaalregurgitatsiooni puudumise tõttu";
-            let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0, arero = 0, arrv = 0, mvpgmean = 0, mvava = 3, mvvti = 0;
+            let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0, arero = 0, arrv = 0, mvpgmean = 0, mvava = 3, mvvti = 0, spap = 0;
             let j = 0;
             for (let i = 0; i < a.length; i++) {
                 if (a[i] === "AV mean PG") {
@@ -332,10 +332,31 @@
                 facx = fac < 35 ? `langenud (FAC ${Math.round(fac)}%)` : `normis (FAC ${Math.round(fac)}%)`;
             }
 
-            let ea = 0;
+            let ea = 0, rrx = "RÜTM PUUDU E/A JÄRGI";
             if (a.includes("MV E / A")) {
                 ea = safeParseFloat(a, a.indexOf("MV E / A") + 1, "MV E / A");
+                if (a.includes("AV HR")) {
+                    const rr = safeParseFloat(a, a.indexOf("AV HR") + 1, "AV HR");
+                    let esimene = Math.ceil(rr / 5) * 5;
+                    let teine = esimene > 60/rr ? esimene - 5 : esimene + 5;
+                    rrx = `Siinusrütm ${Math.min(esimene, teine)}-${Math.max(esimene, teine)} x'`;
+                }
+            } else {
+                if (a.includes("AV HR")) {
+                    const rr = safeParseFloat(a, a.indexOf("AV HR") + 1, "AV HR");
+                    let esimene = Math.ceil(rr / 5) * 5;
+                    let teine = esimene > 60/rr ? esimene - 5 : esimene + 5;
+                    rrx = `Kodade virvendusarütmia ${Math.min(esimene, teine)}-${Math.max(esimene, teine)} x'`;
+                }
             }
+
+            /*let rrx = "Kodade virvendusarütmia  x'";
+            if (a.includes("AV HR")) {
+                const rr = safeParseFloat(a, a.indexOf("AV HR") + 1, "AV HR");
+                let esimene = Math.ceil(rr / 5) * 5;
+                let teine = esimene > 60/rr ? esimene - 5 : esimene + 5;
+                rrx = `Siinusrütm ${Math.min(esimene, teine)}-${Math.max(esimene, teine)} x'`;
+            }*/
 
             let diastx = "PUUDU";
             if (a.includes("MV E / E' Sept") && a.includes("MV E / E' Lat")) { 
@@ -343,8 +364,36 @@
                 const eesept = safeParseFloat(a, a.indexOf("MV E / E' Sept") + 1, "MV E / E' Sept");
                 const eelat = safeParseFloat(a, a.indexOf("MV E / E' Lat") + 1, "MV E / E' Lat");
                 const eesuhe = (eesept + eelat) / 2;
+                const esuhe = (elat + emed) / 2;
                 let h = 0;
+                if (elat < 7.5 || emed < 6.5 || esuhe < 6.6) h++;
+                if (eelat > 12.5 || eemed > 14.5 || eesuhe > 13.5) h++;
+                if (trvel > 2.75 || spap > 34.5) h++; 
 
+                if (h < 1) diastx = "funktsioon normis";
+                else if (h > 2) {
+                    if (ea > 1.99) {
+                        diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
+                    } else {
+                        diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
+                    }
+                } else if (h < 2 && (elat < 7.5 || emed < 6.5 || esuhe < 6.6)) {
+                    if (ea < 0.85) {
+                        diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
+                    }
+                } else {
+                    if (laesvi > 34) {
+                        if (ea > 1.99) {
+                            diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
+                        } else {
+                            diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
+                        }
+                    }
+                    else {
+                        diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas"; // siin pole kopsuveene, LA straini, IVRT jne arvestatud. Samuti puudu KVA korral diastoolne funktsioon
+                    }
+                }
+                /* VANA DIASTOOLNE FUNKTSIOON
                 if (lvefx === "normaalne") {
                     if (eesuhe > 14) h++;
                     if (elat < 10 || emed < 7) h++;
@@ -372,7 +421,7 @@
                             diastx = trvel > 0 ? "düsfunktsioon ilma rõhu tõusuta vasakus kojas" : "funktsioon ei ole hinnatav";
                         }
                     }
-                }
+                }*/
             }
 
             let asx = "klapi funktsioon normis"; 
@@ -417,14 +466,6 @@
                 mrx = `raske regurgitatsioon (VC laius ${mrvc} cm, PISAr ${mrpisa} cm, ERO ${mrero} cm²)`;
             } else if (mrvc > 0.30 || mrpisa > 0.3 || mrero > 0.19 || mrvol > 29.9) {
                 mrx = `keskmine regurgitatsioon (VC laius ${mrvc} cm, PISAr ${mrpisa} cm, ERO ${mrero} cm²)`;
-            }
-
-            let rrx = "Kodade virvendusarütmia  x'";
-            if (a.includes("AV HR")) {
-                const rr = safeParseFloat(a, a.indexOf("AV HR") + 1, "AV HR");
-                let esimene = Math.ceil(rr / 5) * 5;
-                let teine = esimene > 60/rr ? esimene - 5 : esimene + 5;
-                rrx = `Siinusrütm ${Math.min(esimene, teine)}-${Math.max(esimene, teine)} x'`;
             }
 
             let straintekst = "", glsx = ""; // vana
