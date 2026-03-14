@@ -373,7 +373,7 @@
                 if (h < 1) diastx = "funktsioon normis";
                 else if (h > 2) {
                     if (ea > 1.99) {
-                        diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
+                        diastx = `düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele ${h}`;
                     } else {
                         diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
                     }
@@ -384,7 +384,7 @@
                 } else {
                     if (laesvi > 34) {
                         if (ea > 1.99) {
-                            diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
+                            diastx = `düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele ${h}`;
                         } else {
                             diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
                         }
@@ -514,7 +514,7 @@
 Suboptimaalne nähtavus. ${rrx}.
 
 Vasaku vatsakese õõs ${edvix}, müokard ${seinapaksusx}. Üldine süstoolne funktsioon on ${lvefx}, EF bp ${Math.round(lvef)}%, LVOT VTI ${Math.round(lvotvti)} cm. ${glsx}Segmentaarset kineetikahäiret ei tähelda.
-Diastoolne ${diastx}. ${lastrainx} ${h}
+Diastoolne ${diastx}. ${lastrainx} 
 
 Parem vatsake on ${rvbasex}. Longitudinaalne süstoolne funktsioon ${rvlongx} (TAPSE ${tapse.toFixed(1)} cm, RV S' ${rvs.toFixed(1)} cm/s), tsirkulaarne süstoolne funktsioon ${facx}. ${rvstrainx}
 Kopsuringe süstoolne rõhk ${spapx}. ${mpapx}
