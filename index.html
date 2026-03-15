@@ -218,6 +218,9 @@
                 if (a[i] === "MV E Velocity") {
                     emax = safeParseFloat(a, i + 1, "MV E Velocity");
                 }
+                if (a[i] === "MV Dec. Time") {
+                    dt = safeParseFloat(a, i + 1, "MV Dec. Time");
+                }
                 if (a[i] === "TR max PG") {
                     const trpg = safeParseFloat(a, i + 1, "TR max PG");
                     const spap = trpg + rap;
@@ -366,31 +369,44 @@
                 const eesuhe = (eesept + eelat) / 2;
                 const esuhe = (elat + emed) / 2;
                 let h = 0;
-                if (elat < 7.5 || emed < 6.5 || esuhe < 6.6) h++;
-                if (eelat > 12.5 || eemed > 14.5 || eesuhe > 13.5) h++;
-                if (trvel > 2.75 || spap > 34.5) h++; 
 
-                if (h < 1) diastx = "funktsioon normis";
-                else if (h > 2) {
-                    if (ea > 1.99) {
-                        diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
-                    } else {
-                        diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
-                    }
-                } else if (h < 2 && (elat < 7.5 || emed < 6.5 || esuhe < 6.6)) {
-                    if (ea < 0.85) {
-                        diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
-                    }
-                } else {
-                    if (laesvi > 34) {
+                if (!a.includes("MV E / A")) {
+                    if (emax > 0.99) h++;
+                    if (eesept > 11) h++;
+                    if (trvel > 2.8 || spap > 35) h++; 
+                    if (dt < 161) h++;
+
+                    if (h > 2) diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
+                    else if (h < 2) diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
+                    else diastx = "düsfunktsioon, rõhk vasakus kojas ei ole hinnatav" // siin pole kopsuveene, LA straini, KMI arvestatud.
+                }
+                else {
+                    if (elat < 7.5 || emed < 6.5 || esuhe < 6.6) h++;
+                    if (eelat > 12.5 || eesept > 14.5 || eesuhe > 13.5) h++;
+                    if (trvel > 2.75 || spap > 34.5) h++; 
+    
+                    if (h < 1) diastx = "funktsioon normis";
+                    else if (h > 2) {
                         if (ea > 1.99) {
                             diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
                         } else {
                             diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
                         }
-                    }
-                    else {
-                        diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas"; // siin pole kopsuveene, LA straini, IVRT jne arvestatud. Samuti puudu KVA korral diastoolne funktsioon
+                    } else if (h < 2 && (elat < 7.5 || emed < 6.5 || esuhe < 6.6)) {
+                        if (ea < 0.85) {
+                            diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
+                        }
+                    } else {
+                        if (laesvi > 34) {
+                            if (ea > 1.99) {
+                                diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
+                            } else {
+                                diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
+                            }
+                        }
+                        else {
+                            diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas"; // siin pole kopsuveene, LA straini, IVRT jne arvestatud.
+                        }
                     }
                 }
                 /* VANA DIASTOOLNE FUNKTSIOON
