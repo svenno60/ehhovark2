@@ -396,6 +396,18 @@
                         if (ea < 0.85) {
                             diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
                         }
+                        else {
+                            if (laesvi > 34) {
+                                if (ea > 1.99) {
+                                    diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
+                                } else {
+                                    diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
+                                }
+                            }
+                            else {
+                                diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas"; // siin pole kopsuveene, LA straini, IVRT jne arvestatud.
+                            }
+                        }
                     } else {
                         if (laesvi > 34) {
                             if (ea > 1.99) {
