@@ -191,7 +191,7 @@
             }
 
             let rvlongx = "PUUDU", trvel = 0, spapx = "ei ole hinnatav registreeritava trikuspidaalregurgitatsiooni puudumise tõttu";
-            let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0, arero = 0, arrv = 0, mvpgmean = 0, mvava = 3, mvvti = 0, spap = 0, dt = 200;
+            let vmax = 0, pgmean = 0, lvotvti = 20, raarea = 0, mrvc = 0, mrpisa = 0, mrero = 0, mrvol = 0, aipht = 0, arvc = 0, arero = 0, arrv = 0, mvpgmean = 0, mvava = 3, mvvti = 0, spap = 0, dt = 200, pvsd = 0;
             let j = 0;
             for (let i = 0; i < a.length; i++) {
                 if (a[i] === "AV mean PG") {
@@ -267,6 +267,9 @@
                 }
                 if (a[i] === "MV VTI") { 
                     mvvti = safeParseFloat(a, i + 1, "MV VTI");
+                }
+                if (a[i] === "P Vein S / D") { 
+                    pvsd = safeParseFloat(a, i + 1, "P Vein S / D");
                 }
                 j++;
             }
@@ -381,7 +384,7 @@
                     else diastx = "düsfunktsioon, rõhk vasakus kojas ei ole hinnatav" // siin pole kopsuveene, LA straini, KMI arvestatud.
                 }
                 else {
-                    if (elat < 7.5 || emed < 6.5 || esuhe < 6.6) h++;
+                    if (elat < 7.1 || emed < 6.1 || esuhe < 6.6) h++;
                     if (eelat > 12.5 || eesept > 14.5 || eesuhe > 13.5) h++;
                     if (trvel > 2.75 || spap > 34.5) h++; 
     
@@ -397,7 +400,7 @@
                             diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
                         }
                         else {
-                            if (laesvi > 34) {
+                            if (laesvi > 34 || (pvsd > 0 && pvsd < 0.8)) {
                                 if (ea > 1.99) {
                                     diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
                                 } else {
@@ -405,11 +408,11 @@
                                 }
                             }
                             else {
-                                diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas"; // siin pole kopsuveene, LA straini, IVRT jne arvestatud.
+                                diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas"; // siin pole LA straini, IVRT jne arvestatud.
                             }
                         }
                     } else {
-                        if (laesvi > 34) {
+                        if (laesvi > 34 || (pvsd > 0 && pvsd < 0.8)) {
                             if (ea > 1.99) {
                                 diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas, viited restriktiivsele täitumisele";
                             } else {
@@ -417,7 +420,7 @@
                             }
                         }
                         else {
-                            diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas"; // siin pole kopsuveene, LA straini, IVRT jne arvestatud.
+                            diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas"; // siin pole LA straini, IVRT jne arvestatud.
                         }
                     }
                 }
@@ -496,9 +499,9 @@
                 mrx = `keskmine regurgitatsioon (VC laius ${mrvc} cm, PISAr ${mrpisa} cm, ERO ${mrero} cm²)`;
             }
 
-            let straintekst = "", glsx = ""; // vana
-            if (a.includes("GLS_Endo_Peak_Avg:")) {
-                const gls = safeParseFloat(a, a.indexOf("GLS_Endo_Peak_Avg:") + 1, "GLS_Endo_Peak_Avg");
+            let straintekst = "", glsx = ""; 
+            if (a.includes("GLS Avg (AFI)")) {
+                const gls = safeParseFloat(a, a.indexOf("GLS Avg (AFI)") + 1, "GLS Avg (AFI)");
                 straintekst += " + LV strain";
                 if (gls < -18) {
                     glsx = `Vasaku vatsakese globaalne longitudinaalne venitatavus ehk GLS on normis (${gls}%). `;
@@ -522,16 +525,16 @@
                 }
             }
 
-            let lastrainx = ""; // vana
-            if (a.includes("LASrED:")) {
-                const lastrain = safeParseFloat(a, a.indexOf("LASrED:") + 1, "LASrED");
+            let lastrainx = ""; // vaid 4 kambri oma, pole veel inkorporeerinud diastoolsesse
+            if (a.includes("LASr R-wave (A4C)")) {
+                const lastrain = safeParseFloat(a, a.indexOf("LASr R-wave (A4C)") + 1, "LASr R-wave (A4C)");
                 straintekst += " + LA strain";
-                if (lastrain < 20) {
+                if (lastrain < 19) {
                     lastrainx = `Vasaku koja strain oluliselt langenud (${lastrain}%).`;
-                    diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
+                    //diastx = "düsfunktsioon koos rõhu tõusuga vasakus kojas";
                 } else if (lastrain < 30) {
                     lastrainx = `Vasaku koja strain on langenud (${lastrain}%).`;
-                    diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
+                    //diastx = "düsfunktsioon ilma rõhu tõusuta vasakus kojas";
                 } else {
                     lastrainx = `Vasaku koja strain on normis (${lastrain}%).`;
                 }
