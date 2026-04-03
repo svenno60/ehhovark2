@@ -435,8 +435,8 @@
             }
 
             let lastrainx = ""; // vaid 4 kambri oma
-            if (a.includes("LASr R-wave (A4C)")) {
-                const lastrain = safeParseFloat(a, a.indexOf("LASr R-wave (A4C)") + 1, "LASr R-wave (A4C)");
+            if (a.includes("LASr R-Wave (A4C)")) {
+                const lastrain = safeParseFloat(a, a.indexOf("LASr R-Wave (A4C)") + 1, "LASr R-Wave (A4C)");
                 straintekst += " + LA strain";
                 if (lastrain < 19) {
                     lastrainx = `Vasaku koja strain oluliselt langenud (${lastrain}%).`;
