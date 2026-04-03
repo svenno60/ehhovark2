@@ -409,8 +409,8 @@
             }
 
             let straintekst = "", glsx = ""; 
-            if (a.includes("GLS Avg (AFI)")) {
-                const gls = safeParseFloat(a, a.indexOf("GLS Avg (AFI)") + 1, "GLS Avg (AFI)");
+            if (a.includes("GLS avg (AFI)")) {
+                const gls = safeParseFloat(a, a.indexOf("GLS avg (AFI)") + 1, "GLS avg (AFI)");
                 straintekst += " + LV strain";
                 if (gls < -18) {
                     glsx = `Vasaku vatsakese globaalne longitudinaalne venitatavus ehk GLS on normis (${gls}%). `;
